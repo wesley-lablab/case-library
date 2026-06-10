@@ -29,6 +29,7 @@ function writeData(data) {
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: process.env.VITE_BASE_URL || './',
   server: {
     host: '0.0.0.0',
     port: 5173,
