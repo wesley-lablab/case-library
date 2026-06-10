@@ -36,7 +36,7 @@ function saveToStorage(cases: Case[]) {
 async function loadInitialData(): Promise<Case[]> {
   try {
     // 添加时间戳参数绕过浏览器缓存
-    const res = await fetch(`/data.json?v=${Date.now()}`)
+    const res = await fetch(`./data.json?v=${Date.now()}`)
     if (res.ok) {
       const data = await res.json()
       if (data && Array.isArray(data.cases) && data.cases.length > 0) {
