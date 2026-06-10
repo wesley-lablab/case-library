@@ -35,7 +35,8 @@ function saveToStorage(cases: Case[]) {
 // 从项目 data.json 文件加载初始数据
 async function loadInitialData(): Promise<Case[]> {
   try {
-    const res = await fetch('/data.json')
+    // 添加时间戳参数绕过浏览器缓存
+    const res = await fetch(`/data.json?v=${Date.now()}`)
     if (res.ok) {
       const data = await res.json()
       if (data && Array.isArray(data.cases) && data.cases.length > 0) {
@@ -53,18 +54,18 @@ export const useCaseStore = defineStore('case', () => {
   const isLoading = ref(true)
 
   onMounted(async () => {
-    // 优先从 localStorage 加载
-    const stored = loadFromStorage()
-    if (stored.length > 0) {
-      allCases.value = stored
-      console.log(`[案例库] 从本地存储加载了 ${stored.length} 条案例`)
+    // 始终从 data.json 加载最新数据
+    const initial = await loadInitialData()
+    if (initial.length > 0) {
+      allCases.value = initial
+      saveToStorage(initial)
+      console.log(`[案例库] 从 data.json 加载了 ${initial.length} 条案例`)
     } else {
-      // 如果 localStorage 没有数据，从 data.json 加载
-      const initial = await loadInitialData()
-      if (initial.length > 0) {
-        allCases.value = initial
-        saveToStorage(initial)
-        console.log(`[案例库] 从 data.json 加载了 ${initial.length} 条案例`)
+      // 如果 data.json 加载失败，尝试从 localStorage 加载
+      const stored = loadFromStorage()
+      if (stored.length > 0) {
+        allCases.value = stored
+        console.log(`[案例库] 从本地存储加载了 ${stored.length} 条案例`)
       } else {
         console.warn('[案例库] 没有可用的案例数据')
       }
