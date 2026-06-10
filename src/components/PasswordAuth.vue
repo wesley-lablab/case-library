@@ -131,8 +131,7 @@ const clearInput = () => {
       </div>
 
       <div class="auth-footer">
-        <p class="hint-text">默认账户：admin / admin123</p>
-        <p class="hint-text">普通用户：user1 / user123</p>
+        <p class="hint-text">© 中旅会展案例库 · 请联系管理员获取账号</p>
       </div>
     </div>
   </div>

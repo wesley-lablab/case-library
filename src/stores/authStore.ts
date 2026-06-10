@@ -17,9 +17,11 @@ export const useAuthStore = defineStore('auth', () => {
 
   // 默认用户列表
   const defaultUsers: User[] = [
-    { username: 'admin', password: 'admin123', role: 'admin' },
-    { username: 'user1', password: 'user123', role: 'user' },
-    { username: 'user2', password: 'user456', role: 'user' },
+    { username: '111', password: '111', role: 'admin' },
+    { username: '222', password: '222', role: 'user' },
+    { username: '333', password: '333', role: 'user' },
+    { username: '444', password: '444', role: 'user' },
+    { username: '555', password: '555', role: 'user' },
   ]
 
   // 从localStorage加载用户
