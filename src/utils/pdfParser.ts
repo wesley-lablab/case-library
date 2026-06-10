@@ -209,16 +209,18 @@ export const extractTextFromPDFWithOCR = async (file: File): Promise<PDFTextCont
     console.log(`[OCR] 已渲染 ${pageImages.length} 页，开始OCR识别...`)
 
     // Step 2: 使用OCR识别图片中的文字
-    const ocrResult = await ocrImages(pageImages)
+    const imageDataArray = pageImages.map(p => p.imageData)
+    const fullText = await ocrImages(imageDataArray)
+    const pageTexts = fullText.split('\n\n')
 
-    console.log(`[OCR] OCR识别完成，共识别 ${ocrResult.pageTexts.length} 页`)
+    console.log(`[OCR] OCR识别完成，共识别 ${pageTexts.length} 页`)
 
     // Step 3: 解析金额
-    const amountMatches = parseAmountsFromText(ocrResult.pageTexts)
+    const amountMatches = parseAmountsFromText(pageTexts)
 
     return {
-      fullText: ocrResult.fullText,
-      pageTexts: ocrResult.pageTexts,
+      fullText: fullText,
+      pageTexts: pageTexts,
       amountMatches,
       numPages
     }

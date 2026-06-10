@@ -19,6 +19,8 @@ export interface Case {
   solution?: string
   results?: string
   testimonial?: string
+  client?: string
+  tags?: string[]
 }
 
 export type CaseType =

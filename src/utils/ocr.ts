@@ -2,7 +2,7 @@
  * OCR功能模块 - 使用Tesseract.js进行文字识别
  */
 
-import { createWorker, type PSM, type OEM } from 'tesseract.js'
+import { createWorker } from 'tesseract.js'
 
 export interface OCRResult {
   text: string
@@ -11,7 +11,7 @@ export interface OCRResult {
 }
 
 // 缓存worker以提高性能
-let workerPromise: Promise<ReturnType<typeof createWorker>> | null = null
+let workerPromise: Promise<any> | null = null
 let workerInitFailed = false
 
 const withTimeout = async <T>(
@@ -37,7 +37,7 @@ const withTimeout = async <T>(
   }
 }
 
-const getWorker = async (): Promise<ReturnType<typeof createWorker>> => {
+const getWorker = async (): Promise<any> => {
   if (workerInitFailed) {
     throw new Error('OCR引擎初始化失败，请检查网络连接后重试')
   }
@@ -49,47 +49,26 @@ const getWorker = async (): Promise<ReturnType<typeof createWorker>> => {
   workerPromise = (async () => {
     try {
       console.log('[OCR] 正在创建Worker...')
-      const worker = await withTimeout(
-        createWorker({
-          logger: (m) => {
-            if (m.status === 'recognizing text') {
-              console.log(`[OCR] 识别进度: ${Math.round(m.progress * 100)}%`)
-            } else if (m.status) {
-              console.log(`[OCR] ${m.status}`)
-            }
-          }
-        }),
+      const worker: any = await withTimeout(
+        (createWorker as any)(['chi_sim', 'eng']),
         60000,
         'OCR引擎初始化超时（60秒），请检查网络连接'
       )
 
-      console.log('[OCR] 正在加载语言包 (chi_sim+eng)...')
-      await withTimeout(
-        worker.loadLanguage('chi_sim+eng'),
-        60000,
-        '加载OCR语言包超时（60秒），请检查网络连接'
-      )
-
-      console.log('[OCR] 正在初始化语言包...')
-      await withTimeout(
-        worker.initialize('chi_sim+eng'),
-        60000,
-        '初始化OCR引擎超时（60秒）'
-      )
-
       console.log('[OCR] 正在配置OCR参数...')
-      await worker.setParameters({
-        tessedit_pageseg_mode: '3' as unknown as PSM,
-        tessedit_ocr_engine_mode: '3' as unknown as OEM,
-        preserve_interword_spaces: '1',
-      })
+      if (worker && typeof worker.setParameters === 'function') {
+        await worker.setParameters({
+          tessedit_pageseg_mode: '3',
+          tessedit_ocr_engine_mode: '3',
+          preserve_interword_spaces: '1',
+        })
+      }
 
       console.log('[OCR] OCR引擎初始化完成')
       return worker
     } catch (error) {
-      console.error('[OCR] 初始化OCR引擎失败:', error)
-      workerPromise = null
       workerInitFailed = true
+      console.error('[OCR] 初始化失败:', error)
       throw error
     }
   })()
@@ -98,70 +77,73 @@ const getWorker = async (): Promise<ReturnType<typeof createWorker>> => {
 }
 
 /**
- * 对单张图片进行OCR识别
+ * 对图片进行OCR文字识别
+ * @param imageData 图片数据（base64、Blob或图片URL）
+ * @returns 识别结果
  */
-export const ocrImage = async (imageData: string | File): Promise<OCRResult> => {
+export async function recognizeImage(imageData: string | Blob | File): Promise<OCRResult> {
   const worker = await getWorker()
-  const { data } = await worker.recognize(imageData)
 
-  const lines = data.lines.map(line => ({
-    text: line.text.trim(),
-    confidence: line.confidence
-  })).filter(line => line.text.length > 0)
+  try {
+    console.log('[OCR] 开始识别图片...')
+    const result: any = await withTimeout(
+      worker.recognize(imageData),
+      120000,
+      '图片识别超时（120秒）'
+    )
 
-  return {
-    text: data.text,
-    confidence: data.confidence,
-    lines
+    const text = result?.data?.text || ''
+    const confidence = result?.data?.confidence || 0
+    const lines =
+      result?.data?.lines?.map((line: any) => ({
+        text: line.text || '',
+        confidence: line.confidence || 0,
+      })) || []
+
+    console.log(`[OCR] 识别完成，置信度: ${confidence}%，文字长度: ${text.length}`)
+
+    return { text, confidence, lines }
+  } catch (error) {
+    console.error('[OCR] 识别失败:', error)
+    throw error
   }
 }
 
 /**
- * 对多张图片进行OCR识别
+ * 批量识别图片
+ * @param images 图片数组
+ * @returns 所有图片的合并文字
  */
-export const ocrImages = async (images: { imageData: string; pageNumber: number }[]): Promise<{
-  pageTexts: string[]
-  fullText: string
-  pageResults: { page: number; result: OCRResult }[]
-}> => {
-  const pageTexts: string[] = []
-  const pageResults: { page: number; result: OCRResult }[] = []
+export async function recognizeMultipleImages(images: (string | Blob | File)[]): Promise<string> {
+  if (images.length === 0) return ''
+
+  const allTexts: string[] = []
 
   for (let i = 0; i < images.length; i++) {
-    const { imageData, pageNumber } = images[i]
-    console.log(`[OCR] 正在识别第 ${pageNumber} 页...`)
-
     try {
-      const result = await ocrImage(imageData)
-      pageTexts.push(result.text)
-      pageResults.push({ page: pageNumber, result })
-      console.log(`[OCR] 第 ${pageNumber} 页识别完成 (置信度: ${result.confidence.toFixed(1)}%)`)
+      console.log(`[OCR] 正在识别第 ${i + 1}/${images.length} 张图片...`)
+      const result = await recognizeImage(images[i])
+      if (result.text.trim()) {
+        allTexts.push(result.text.trim())
+      }
     } catch (error) {
-      console.warn(`[OCR] 第 ${pageNumber} 页识别失败:`, error)
-      pageTexts.push('')
+      console.warn(`[OCR] 第 ${i + 1} 张图片识别失败，跳过`)
     }
   }
 
-  const fullText = pageTexts.join('\n\n')
-  return { pageTexts, fullText, pageResults }
+  return allTexts.join('\n\n')
 }
 
 /**
- * 清理OCR worker资源
+ * 重置OCR引擎状态（用于重试）
  */
-export const terminateOCR = async () => {
-  if (workerPromise) {
-    const worker = await workerPromise
-    await worker.terminate()
-    workerPromise = null
-  }
-  workerInitFailed = false
-}
-
-/**
- * 重置OCR状态，允许重新初始化
- */
-export const resetOCR = () => {
+export function resetOCREngine() {
   workerPromise = null
   workerInitFailed = false
+  console.log('[OCR] 引擎状态已重置')
 }
+
+// 兼容旧版本命名导出
+export const ocrImage = recognizeImage
+export const ocrImages = recognizeMultipleImages
+export const resetOCR = resetOCREngine

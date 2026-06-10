@@ -162,15 +162,15 @@ const handleImportConfirm = () => {
 <style scoped>
 .navbar {
   @apply fixed top-0 left-0 right-0 z-50 bg-primary text-white;
-  height: 72px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  min-height: 72px;
+  height: 80px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .navbar-content {
-  @apply container mx-auto px-6 h-full flex items-center justify-between;
-  min-height: 72px;
-  flex-wrap: nowrap;
+  @apply h-full flex items-center gap-6;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 32px;
 }
 
 .navbar-brand {
@@ -188,14 +188,14 @@ const handleImportConfirm = () => {
 }
 
 .navbar-title {
-  @apply text-2xl font-serif font-bold tracking-wide;
+  @apply text-2xl font-serif font-bold;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 .navbar-stats {
-  @apply flex items-center gap-6 px-6 py-3 rounded-full;
-  background-color: rgba(255, 255, 255, 0.15);
+  @apply flex items-center gap-6 px-6 py-3 rounded-xl;
+  background-color: rgba(255, 255, 255, 0.08);
   flex-shrink: 0;
 }
 
@@ -205,7 +205,7 @@ const handleImportConfirm = () => {
 }
 
 .stat-label {
-  @apply text-xs text-white/60 uppercase tracking-wider;
+  @apply text-xs text-white/60;
   white-space: nowrap;
 }
 
@@ -215,17 +215,18 @@ const handleImportConfirm = () => {
 }
 
 .stat-divider {
-  @apply w-px h-8 bg-white/20;
+  @apply w-px h-8 bg-white/15;
   flex-shrink: 0;
 }
 
 .navbar-actions {
-  @apply flex items-center gap-3;
+  @apply flex items-center gap-3 ml-auto;
   flex-shrink: 0;
 }
 
 .user-info {
-  @apply flex items-center gap-2 px-3 py-2 bg-white/10 rounded-lg text-sm;
+  @apply flex items-center gap-2 px-4 py-2 bg-white/10 rounded-lg text-sm;
+  flex-shrink: 0;
 }
 
 .user-info svg {
@@ -241,33 +242,30 @@ const handleImportConfirm = () => {
 }
 
 .btn-primary {
-  @apply flex items-center gap-2 bg-accent hover:bg-accent/90 text-white px-5 py-2.5 rounded-lg font-medium transition-all duration-200;
+  @apply flex items-center gap-2 bg-accent hover:bg-accent/90 text-white px-5 py-2.5 rounded-lg font-medium transition-all duration-200 text-sm;
   flex-shrink: 0;
 }
 
 .btn-primary:hover {
-  @apply transform -translate-y-0.5;
-  box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+  box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
 }
 
 .btn-secondary {
-  @apply flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-lg font-medium transition-all duration-200 border border-white/20;
+  @apply flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-lg font-medium transition-all duration-200 border border-white/15 text-sm;
   flex-shrink: 0;
 }
 
 .btn-secondary:hover {
-  @apply transform -translate-y-0.5;
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
 }
 
 .btn-logout {
-  @apply flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-lg font-medium transition-all duration-200 border border-white/20;
+  @apply flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-lg font-medium transition-all duration-200 border border-white/15 text-sm;
   flex-shrink: 0;
 }
 
 .btn-logout:hover {
-  @apply transform -translate-y-0.5;
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
 }
 
 /* 导入模态框 */
@@ -339,15 +337,73 @@ const handleImportConfirm = () => {
   @apply bg-red-500 hover:bg-red-600;
 }
 
+@media (max-width: 1280px) {
+  .navbar-content {
+    gap: 24px;
+    padding: 0 24px;
+  }
+
+  .navbar-stats {
+    gap: 20px;
+    padding: 10px 20px;
+  }
+
+  .navbar-actions {
+    gap: 8px;
+  }
+
+  .user-info {
+    padding: 6px 10px;
+  }
+
+  .btn-primary {
+    padding: 8px 12px;
+  }
+
+  .btn-secondary,
+  .btn-logout {
+    padding: 8px 10px;
+  }
+
+  .navbar-title {
+    @apply text-xl;
+  }
+
+  .stat-value {
+    @apply text-lg;
+  }
+}
+
 @media (max-width: 1024px) {
   .navbar-stats {
     @apply hidden;
   }
+
+  .user-info {
+    @apply hidden;
+  }
+
+  .navbar-content {
+    gap: 16px;
+    padding: 0 20px;
+  }
+
+  .navbar-title {
+    @apply text-lg;
+  }
+
+  .navbar-logo {
+    @apply h-8;
+  }
 }
 
 @media (max-width: 768px) {
+  .navbar {
+    height: 72px;
+  }
+
   .navbar-title {
-    @apply text-xl;
+    @apply text-lg;
   }
 
   .btn-primary span {
@@ -358,33 +414,38 @@ const handleImportConfirm = () => {
     @apply hidden;
   }
 
-  .user-info {
-    @apply hidden;
-  }
-
   .btn-secondary span {
     @apply hidden;
   }
 
   .navbar-content {
-    @apply px-4;
+    gap: 12px;
+    padding: 0 16px;
+  }
+
+  .navbar-logo {
+    @apply h-7;
   }
 }
 
 @media (max-width: 480px) {
   .navbar {
     height: auto;
-    min-height: 64px;
+    min-height: 68px;
   }
 
   .navbar-content {
     flex-wrap: wrap;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: 16px;
+    padding-bottom: 16px;
   }
 
   .navbar-brand {
     flex: 1;
+  }
+
+  .navbar-title {
+    @apply text-base;
   }
 
   .navbar-actions {

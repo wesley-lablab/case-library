@@ -570,7 +570,7 @@ const importAllCases = () => {
       images,
       description: caseItem.description,
       summary: caseItem.summary,
-      status: 'completed',
+      status: 'completed' as const,
       client: caseItem.client,
       tags: caseItem.tags,
     }

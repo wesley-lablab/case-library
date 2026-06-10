@@ -135,7 +135,7 @@ body {
 }
 
 .main-content {
-  padding-top: 72px;
+  padding-top: 100px;
 }
 
 .line-clamp-3 {

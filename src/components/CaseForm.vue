@@ -562,6 +562,10 @@ const updateField = (field: keyof Partial<Case>, value: any) => {
   }
 }
 
+const openDocumentUrl = (url: string) => {
+  window.open(url, '_blank')
+}
+
 const handleClickOutside = (e: MouseEvent) => {
   if (showTemplateMenu.value && e.target) {
     const target = e.target as HTMLElement
@@ -1033,7 +1037,7 @@ onUnmounted(() => {
                   <p class="contract-preview-name">{{ localForm.uploadedFileName }}</p>
                   <button
                     class="contract-download-btn"
-                    @click="() => localForm.documentUrl && window.open(localForm.documentUrl, '_blank')"
+                    @click="() => localForm.documentUrl && openDocumentUrl(localForm.documentUrl)"
                   >
                     在新窗口打开
                   </button>

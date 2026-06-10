@@ -87,6 +87,10 @@ const openContractPreview = () => {
   }
 }
 
+const openDocumentUrl = (url: string) => {
+  window.open(url, '_blank')
+}
+
 // 图片预览功能
 const previewImages = computed(() => caseDetail.value?.images || [])
 
@@ -357,7 +361,7 @@ onUnmounted(() => {
                   <p class="contract-preview-name">{{ caseDetail?.uploadedFileName }}</p>
                   <button
                     class="contract-download-btn"
-                    @click="() => caseDetail?.documentUrl && window.open(caseDetail.documentUrl, '_blank')"
+                    @click="() => caseDetail?.documentUrl && openDocumentUrl(caseDetail.documentUrl)"
                   >
                     在新窗口打开
                   </button>
